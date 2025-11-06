@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import * as shell from 'shelljs';
-import { Result } from '../../src/lib/result';
-=======
+import { type Result } from '../../src/lib/result.ts';
 import shell from 'shelljs';
->>>>>>> main
 
 type ContractInfo = {
   cmr: string;
@@ -28,14 +24,9 @@ export function compileSimplicityContract(
     };
   }
 
-  const infoResult = shell.exec(
-<<<<<<< HEAD
-    `hal-simplicity simplicity simplicity info "${cmr}"`,
-=======
-    `hal-simplicity simplicity info "${base64Contract}"`,
->>>>>>> main
-    { silent: true },
-  );
+  const infoResult = shell.exec(`hal-simplicity simplicity info "${cmr}"`, {
+    silent: true,
+  });
   if (infoResult.code !== 0) {
     return {
       ok: false,
