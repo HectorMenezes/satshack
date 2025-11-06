@@ -9,7 +9,7 @@ import tseslint from 'typescript-eslint';
 // You should change it to your needs following the documentation.
 export default tseslint.config(
   {
-    ignores: ['**/build/**', '**/tmp/**', '**/coverage/**'],
+    ignores: ['**/build/**', '**/tmp/**', '**/coverage/**', 'copy-assets.js'],
   },
   eslint.configs.recommended,
   eslintConfigPrettier,
@@ -17,7 +17,6 @@ export default tseslint.config(
     extends: [...tseslint.configs.recommended],
 
     files: ['**/*.ts', '**/*.mts'],
-
     plugins: {
       '@typescript-eslint': tseslint.plugin,
     },
@@ -25,7 +24,7 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'warn',
     },
-
+    ignores: ['copy-assets.js'],
     languageOptions: {
       parser: tseslint.parser,
       ecmaVersion: 2020,
@@ -34,7 +33,6 @@ export default tseslint.config(
       globals: {
         ...globals.node,
       },
-
       parserOptions: {
         project: './tsconfig.json',
       },
