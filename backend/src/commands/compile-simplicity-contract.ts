@@ -14,26 +14,24 @@ export function compileSimplicityContract(
     return { ok: false, error: `Compilation failed: ${compileResult.stderr}` };
   }
 
-  const outputLines = compileResult.stdout.trim().split('\n');
-  const cmr = outputLines[outputLines.length - 1].trim();
-
-  if (!cmr) {
+  const inputProgram = compileResult.stdout.replace('Program:', '').replace(/\n/g, '').trim();
+  if (!inputProgram) {
     return {
       ok: false,
-      error: 'Failed to extract compiled program from output',
+      error: 'Failed to compile Simplicity program: simc returned an empty output',
     };
   }
 
-  const infoResult = shell.exec(`hal-simplicity simplicity info "${cmr}"`, {
+  const infoResult = shell.exec(`hal-simplicity simplicity info --liquid "${inputProgram}"`, {
     silent: true,
   });
   if (infoResult.code !== 0) {
+    console.error('hal-simplicity error:', infoResult.stderr);
     return {
       ok: false,
       error: `Failed to get contract info: ${infoResult.stderr}`,
     };
   }
-
   try {
     const contractInfo = JSON.parse(infoResult.stdout.trim());
     const liquidTestNetAddressUnconf =
@@ -42,6 +40,14 @@ export function compileSimplicityContract(
       return {
         ok: false,
         error: 'liquid_testnet_address_unconf not found in contract info',
+      };
+    }
+
+    const cmr = contractInfo.cmr; // Assuming the CMR field is named 'cmr' in the JSON output
+    if (!cmr) {
+      return {
+        ok: false,
+        error: 'CMR not found in contract info',
       };
     }
 
