@@ -3,7 +3,7 @@
 }:
 pkgs.mkShell {
   nativeBuildInputs = with pkgs.buildPackages; [
-    nodePackages_latest.nodejs
+    nodejs_22
     cargo
     rustc
   ];
