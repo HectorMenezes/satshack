@@ -48,9 +48,9 @@ export function main(): void {
   if (isOk(contract)) {
     liquidService().createPSET({
       cmr: contract.value.cmr,
-      winnerAddress: '',
-      txnIdClientOne: '',
-      txnIdClientTwo: '',
+      winnerAddress: "tex1pd2e4sk0yvnls5ad0rxgm9e7k3w543446wk4mrfv5lzusfh6snrhsazc5dq",
+      txnIdClientOne: '070bc3c538c5c70587675171bdd8d476202e7ddeca398400d50b9be43b92b8df',
+      txnIdClientTwo: '6be9bd65fb41a116a0fbfb9d6ba52ebb64ae8df652f1a2ba430668dada9f1ae5',
     });
   }
 
