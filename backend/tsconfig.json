@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "Node16",
-    "moduleResolution": "Node16",
+    "module": "NodeNext", // Changed for native ESM output
+    "moduleResolution": "NodeNext", // Changed for native ESM resolution
     "rootDir": ".",
     "outDir": "build",
     "allowSyntheticDefaultImports": true,
@@ -17,8 +17,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "allowImportingTsExtensions": true,
-    "noEmit": true
+    "noEmit": false
   },
   "include": ["src", "__tests__"]
 }

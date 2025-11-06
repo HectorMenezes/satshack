@@ -1,9 +1,9 @@
-import { compileSimplicityContract } from './commands/compile-simplicity-contract.ts';
-import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders.ts';
+import { compileSimplicityContract } from './commands/compile-simplicity-contract.js';
+import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { liquidService } from '../src/services/liquid-service.ts';
-import { isOk } from './lib/result.ts';
+import { liquidService } from '../src/services/liquid-service.js';
+import { isOk } from './lib/result.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

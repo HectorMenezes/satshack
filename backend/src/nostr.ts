@@ -1,4 +1,3 @@
-
 import { getPublicKey, generateSecretKey } from 'nostr-tools/pure';
 
 const ESCROW_SK = generateSecretKey();
@@ -24,7 +23,7 @@ export async function listenForEscrowEvents(): Promise<void> {
         // Here we would handle the event, for example, by decrypting the message
         // and processing the escrow logic.
       },
-    }
+    },
   );
 
   console.log('Subscription started...');

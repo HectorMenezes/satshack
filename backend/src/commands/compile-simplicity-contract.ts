@@ -1,4 +1,4 @@
-import { type Result } from '../../src/lib/result.ts';
+import { type Result } from '../../src/lib/result.js';
 import shell from 'shelljs';
 
 type ContractInfo = {
