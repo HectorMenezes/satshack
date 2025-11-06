@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import * as shell from 'shelljs';
 import { Result } from '../../src/lib/result';
+=======
+import shell from 'shelljs';
+>>>>>>> main
 
 type ContractInfo = {
   cmr: string;
@@ -25,7 +29,11 @@ export function compileSimplicityContract(
   }
 
   const infoResult = shell.exec(
+<<<<<<< HEAD
     `hal-simplicity simplicity simplicity info "${cmr}"`,
+=======
+    `hal-simplicity simplicity info "${base64Contract}"`,
+>>>>>>> main
     { silent: true },
   );
   if (infoResult.code !== 0) {
