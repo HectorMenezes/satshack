@@ -1,4 +1,4 @@
-import * as shell from 'shelljs';
+import shell from 'shelljs';
 
 type ContractInfo = {
   base64Contract: string;
