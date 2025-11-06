@@ -2,6 +2,8 @@ import { compileSimplicityContract } from './commands/compile-simplicity-contrac
 import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders';
 import * as path from 'path';
 import * as fs from 'fs';
+import { liquidService } from '../src/services/liquid-service';
+import { isOk } from './lib/result';
 
 const CLIENT_ONE_PK =
   '0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'; // 1 * G
@@ -38,6 +40,16 @@ export function main(): void {
 
   console.log(`Computed contract path: ${contractPath}`);
   const contract = compileSimplicityContract(contractPath);
+
+  if (isOk(contract)) {
+    liquidService().createPSET({
+      cmr: contract.value.cmr,
+      winnerAddress: '',
+      txnIdClientOne: '',
+      txnIdClientTwo: '',
+    });
+  }
+
   console.log(`contrac result`, contract);
 }
 

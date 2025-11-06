@@ -1,11 +1,10 @@
 import * as shell from 'shelljs';
+import { Result } from '../../src/lib/result';
 
 type ContractInfo = {
-  base64Contract: string;
+  cmr: string;
   liquidTestNetAddressUnconf: string;
 };
-
-type Result<T, E = string> = { ok: true; value: T } | { ok: false; error: E };
 
 export function compileSimplicityContract(
   contractPath: string,
@@ -16,19 +15,17 @@ export function compileSimplicityContract(
   }
 
   const outputLines = compileResult.stdout.trim().split('\n');
-  const base64Contract = outputLines[outputLines.length - 1].trim();
+  const cmr = outputLines[outputLines.length - 1].trim();
 
-  if (!base64Contract) {
+  if (!cmr) {
     return {
       ok: false,
       error: 'Failed to extract compiled program from output',
     };
   }
 
-  console.log(base64Contract);
-
   const infoResult = shell.exec(
-    `hal-simplicity simplicity simplicity info "${base64Contract}"`,
+    `hal-simplicity simplicity simplicity info "${cmr}"`,
     { silent: true },
   );
   if (infoResult.code !== 0) {
@@ -52,7 +49,7 @@ export function compileSimplicityContract(
     return {
       ok: true,
       value: {
-        base64Contract,
+        cmr,
         liquidTestNetAddressUnconf,
       },
     };
