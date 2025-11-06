@@ -6,7 +6,7 @@ const ESCROW_PK = getPublicKey(ESCROW_SK);
 
 const RELAYS = ['wss://relay.damus.io'];
 
-export async function listenForEscrowEvents() {
+export async function listenForEscrowEvents(): Promise<void> {
   const { SimplePool } = await import('nostr-tools');
   const pool = new SimplePool();
 
