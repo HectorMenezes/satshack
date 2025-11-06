@@ -1,7 +1,11 @@
-import { compileSimplicityContract } from './commands/compile-simplicity-contract';
-import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders';
+import { compileSimplicityContract } from './commands/compile-simplicity-contract.ts';
+import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders.ts';
 import * as path from 'path';
 import * as fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const CLIENT_ONE_PK =
   '0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'; // 1 * G

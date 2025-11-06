@@ -1,4 +1,4 @@
-import * as shell from 'shelljs';
+import shell from 'shelljs';
 
 type ContractInfo = {
   base64Contract: string;
@@ -28,7 +28,7 @@ export function compileSimplicityContract(
   console.log(base64Contract);
 
   const infoResult = shell.exec(
-    `hal-simplicity simplicity simplicity info "${base64Contract}"`,
+    `hal-simplicity simplicity info "${base64Contract}"`,
     { silent: true },
   );
   if (infoResult.code !== 0) {

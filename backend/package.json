@@ -2,7 +2,8 @@
   "name": "nostr-escrow-server",
   "version": "0.0.0",
   "description": "A example of a simplicity escrow contrat with a nostr ui",
-  "type": "commonjs",
+  "type": "module",
+
   "engines": {
     "node": ">= 22.11 < 23"
   },
@@ -31,7 +32,7 @@
     "dev": "nodemon --exec ts-node src/main.ts",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
-    "build": "tsc && node copy-assets.js",
+    "build": "tsc && node copy-assets.cjs",
     "build:watch": "tsc -w -p tsconfig.json",
     "build:release": "npm run clean && tsc -p tsconfig.release.json",
     "lint": "eslint .",
@@ -42,6 +43,7 @@
     "test:watch": "vitest unit"
   },
   "dependencies": {
+    "nostr-tools": "^2.17.2",
     "fs-extra": "^11.3.2",
     "shelljs": "^0.10.0",
     "tslib": "~2.8"

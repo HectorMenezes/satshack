@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",  // Changed from "node16"
-    "lib": ["ES2022", "DOM"],
-    "moduleResolution": "node",  // Explicitly set to match CommonJS
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "rootDir": ".",
     "outDir": "build",
     "allowSyntheticDefaultImports": true,
@@ -17,7 +16,9 @@
     "noUnusedParameters": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
   "include": ["src", "__tests__"]
 }
