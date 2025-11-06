@@ -20,7 +20,7 @@ generate the address itself, propagate the message and sign the final transactio
 However, event with the server, parties can still verify if the contract and
 address, since they only need to download to tools and check it on their side.
 
-```mermaind
+```mermaid
 sequenceDiagram
     participant Alice
     participant Bob
