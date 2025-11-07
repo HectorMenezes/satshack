@@ -2,6 +2,9 @@ import * as networks from 'liquidjs-lib/src/networks.js';
 import * as address from 'liquidjs-lib/src/address.js';
 import { Transaction } from 'liquidjs-lib/src/transaction.js';
 
+import * as http from 'http'; // Line 91
+import * as https from 'https'
+
 import {
   Finalizer as PsetFinalizer,
   Extractor as PsetExtractor,
@@ -73,7 +76,6 @@ export async function broadcastTransaction(
     );
 
     const result = response.data;
-    console.log(result);
     return result;
   } catch (error) {
     console.error('Error broadcasting transaction:', error);
@@ -83,17 +85,23 @@ export async function broadcastTransaction(
 
 
 // Function to fetch UTXO details (example using Blockstream API)
-async function fetchUtxo(txid: string, vout: number) {
+async function fetchUtxo(txid: string, vout: number): Promise<{ scriptPubKey: Buffer; value: number; asset: Buffer }> {
   try {
     const response = await axios.get(
       `https://blockstream.info/liquidtestnet/api/tx/${txid}`,
+        {
+  httpAgent: new (http.Agent)({ family: 4 }), // Force IPv4
+  httpsAgent: new (https.Agent)({ family: 4 }) // Force IPv4 for HTTPS
+}
     );
     const tx = response.data;
     const output = tx.vout[vout];
     // Note: For Liquid, asset is from output.asset (hex), not assumed L_BTC
     const assetHex = output.asset
+    console.log(response.data)
+    console.log(output)
     return {
-      scriptPubKey: Buffer.from(output.scriptPubKey.hex, 'hex'),
+      scriptPubKey: Buffer.from(output.scriptpubkey.hex, 'hex'),
       value: Math.round(output.value * 1e8), // Convert to satoshis (L-BTC uses BTC units)
       asset: Buffer.from(assetHex, 'hex'), // Parse actual asset from API
     };
@@ -138,14 +146,14 @@ async function fetchUtxo(txid: string, vout: number) {
    // Add witness UTXO for both inputs (use asset Buffer directly, no 'hex' encoding)
   updater.addInWitnessUtxo(0, {
     script: utxo1.scriptPubKey,
-    value: Buffer.from(utxo1.value, 'hex'),
-    nounce: Buffer.from(utxo1.value, 'hex'),
+    value: Buffer.from(utxo1.value.toString(16).padStart(16, '0'), 'hex').reverse(),
+    nonce: Buffer.alloc(32),
     asset: utxo1.asset, // Already a Buffer
   });
   updater.addInWitnessUtxo(1, {
     script: utxo2.scriptPubKey,
-    value: Buffer.from(utxo2.value, 'hex'),
-    nounce: Buffer.from(utxo2.value, 'hex'),
+    value: Buffer.from(utxo2.value.toString(16).padStart(16, '0'), 'hex').reverse(),
+    nonce: Buffer.alloc(32),
     asset: utxo2.asset, // Already a Buffer
   });
 
@@ -165,16 +173,13 @@ async function fetchUtxo(txid: string, vout: number) {
 		      cmr, // Commitment Merkle Root
 		          Buffer.from('bef5919fa64ce45f8306849072b26c1bfdd2937e6b81774796ff372bd1eb5362d2', 'hex'), // Control block
 			    ];
-            console.log('Witness stack lengths:', witnessStack.map(b => b.length)); // Debug: Verify stack
           const serializedWitness = serializeWitnessStack(witnessStack);
 
   updater.addInWitnessScript(0, serializedWitness);
 
   const finalizer = new PsetFinalizer(pset);
-  console.log(`pset`, pset);
   finalizer.finalize();
   const tx = PsetExtractor.extract(pset);
-  console.log(`tx`, tx);
   const hex = tx.toHex();
   return hex;
 };
