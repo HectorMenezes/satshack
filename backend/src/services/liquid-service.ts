@@ -98,10 +98,9 @@ async function fetchUtxo(txid: string, vout: number): Promise<{ scriptPubKey: Bu
     const output = tx.vout[vout];
     // Note: For Liquid, asset is from output.asset (hex), not assumed L_BTC
     const assetHex = output.asset
-    console.log(response.data)
     console.log(output)
     return {
-      scriptPubKey: Buffer.from(output.scriptpubkey.hex, 'hex'),
+      scriptPubKey: Buffer.from(output.scriptpubkey, 'hex'),
       value: Math.round(output.value * 1e8), // Convert to satoshis (L-BTC uses BTC units)
       asset: Buffer.from(assetHex, 'hex'), // Parse actual asset from API
     };
