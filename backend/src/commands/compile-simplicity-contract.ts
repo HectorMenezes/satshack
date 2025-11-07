@@ -4,6 +4,7 @@ import shell from 'shelljs';
 type ContractInfo = {
   cmr: string;
   liquidTestNetAddressUnconf: string;
+  programHex: string;
 };
 
 export function compileSimplicityContract(
@@ -58,11 +59,15 @@ export function compileSimplicityContract(
       };
     }
 
+    const buffer = Buffer.from(inputProgram, 'base64');
+    const programHex = buffer.toString('hex');
+
     return {
       ok: true,
       value: {
         cmr,
         liquidTestNetAddressUnconf,
+        programHex,
       },
     };
   } catch (parseError) {

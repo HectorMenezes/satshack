@@ -20,11 +20,47 @@ type CreatePSETInput = {
   txnIdClientTwo: string;
   cmr: string;
   winnerAddress: string;
+  programHex: string;
 };
 
 import axios from 'axios';
 
-export async function broadcastTransaction(psetBase64: string): Promise<string> {
+// Function to serialize witness stack into a single Buffer
+function serializeWitnessStack(stack: Buffer[]): Buffer {
+  // Serialize according to Bitcoin witness format:
+  // - Number of elements (varint)
+  // - For each element: length (varint) + data
+  const buffers: Buffer[] = [];
+
+  // Write number of elements as varint
+  const count = stack.length;
+  if (count < 0xfd) {
+    buffers.push(Buffer.from([count]));
+  } else if (count <= 0xffff) {
+    buffers.push(Buffer.from([0xfd, count & 0xff, (count >> 8) & 0xff]));
+  } else {
+    throw new Error('Witness stack too large');
+  }
+
+  // Write each element: length (varint) + data
+  stack.forEach((item) => {
+    const len = item.length;
+    if (len < 0xfd) {
+      buffers.push(Buffer.from([len]));
+    } else if (len <= 0xffff) {
+      buffers.push(Buffer.from([0xfd, len & 0xff, (len >> 8) & 0xff]));
+    } else {
+      throw new Error('Witness element too large');
+    }
+    buffers.push(item);
+  });
+
+  return Buffer.concat(buffers);
+}
+
+export async function broadcastTransaction(
+  psetBase64: string,
+): Promise<string> {
   try {
     const response = await axios.post(
       'https://blockstream.info/liquidtestnet/api/tx',
@@ -82,9 +118,21 @@ export const createPSET = (input: CreatePSETInput): string => {
   updater.addInTapInternalKey(0, internalKey); // If key-spend or internal key needed
   updater.addInTapMerkleRoot(0, cmr); // For script-path with Simplicity CMR
 
+  // Add witness data (script_witness: ["", programHex, cmr, controlBlock])
+  const witnessStack: Buffer[] = [
+	      Buffer.from(''), // Empty first element
+	          Buffer.from(input.programHex, 'hex'), // Simplicity program
+		      Buffer.from(input.cmr, 'hex'), // Commitment Merkle Root
+		          Buffer.from('bef5919fa64ce45f8306849072b26c1bfdd2937e6b81774796ff372bd1eb5362d2', 'hex'), // Control block
+			    ];
+          const serializedWitness = serializeWitnessStack(witnessStack);
+  updater.addInWitnessScript(0, serializedWitness);
+
   const finalizer = new PsetFinalizer(pset);
+  console.log(`pset`, pset);
   finalizer.finalize();
   const tx = PsetExtractor.extract(pset);
+  console.log(`tx`, tx);
   const hex = tx.toHex();
-  return hex
+  return hex;
 };
