@@ -8,7 +8,7 @@ export function CreateProposalAction(form: AcceptanceForm): Action {
     const created_at = Math.floor(Date.now() / 1000);
 
     const draft = {
-      pubkey: form.proposer,
+      pubkey: form.counterparty,
       kind: KINDS.BET_ACCEPTANCE,
       content: "",
       tags: [

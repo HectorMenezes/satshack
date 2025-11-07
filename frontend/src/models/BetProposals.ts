@@ -31,8 +31,10 @@ export function BetProposalsModel(): Model<BetProposal | []> {
 
   return (store) =>
     store
-      .timeline({
-        kinds: [KINDS.BET_PROPOSAL],
-      })
+      .timeline([
+        {
+          kinds: [KINDS.BET_PROPOSAL],
+        },
+      ])
       .pipe(map((proposals) => proposals.map((p) => presenter(p))));
 }

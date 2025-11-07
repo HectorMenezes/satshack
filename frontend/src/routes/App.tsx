@@ -3,11 +3,9 @@ import { type Component } from "solid-js";
 
 const App: Component = () => {
   return (
-    <div class="flex-1 max-w-[1200px] mx-auto px-6 py-6 w-full">
-      <div class="columns-2 gap-4">
-        <ProposalList />
-      </div>
-    </div>
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2 sm:py-4 lg:py-6">
+      <ProposalList />
+    </main>
   );
 };
 
