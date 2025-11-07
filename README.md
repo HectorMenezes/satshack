@@ -7,8 +7,7 @@ from nostr and simplicity capabilities.
 # Use case
 Suppose Alice and Bob want to bet on something, and they choose _something_
 or _someone_ to be their Escrow. They'll use nostr to communicate and the bet
-will be settled in the Liquid network via a simplicity contract that handled
-the `lBTC`.
+will be settled in the Liquid network via a simplicity contract.
 
 # Sequence Diagram
 
@@ -35,23 +34,7 @@ sequenceDiagram
     Server ->> Bob: funding address
     Bob ->> Bob: send funds
 
-    Server ->> Server: check for both funding
-    Server ->> Escrow: ask for decision
-    Escrow ->> Escrow: signs 
+    Server ->> Escrow: contract data
+    Escrow ->> Escrow: signs & propagates
 ```
-
-#### Parameters passed
-
-Alice first sends the bet with parameters:
-- Amount
-- Alice's bitcoin address
-- Bob's pub key
-- Escrow's pub key
-- Time to expire
-
-Bob adds his bitcoin address and signs the message (confirming Bob is OK with
-the contract params).
-
-Escrow accepts being Escrow by signing the message.
-
 
