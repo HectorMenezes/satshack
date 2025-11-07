@@ -13,7 +13,7 @@ export function createBetEventHandler(pubkyes: {
   CLIENT_ONE_PUBK: string;
   CLIENT_TWO_PUBK: string;
   ESCROW_PUBK: string;
-}): void {
+}): string {
   const contractTemplatePath = path.join(
     __dirname,
     '../contracts/escrow_with_delay.template.simf',
@@ -43,7 +43,7 @@ export function createBetEventHandler(pubkyes: {
   const contract = compileSimplicityContract(contractPath);
 
   if (isOk(contract)) {
-    liquidService().createPSET({
+    const pset = liquidService().createPSET({
       cmr: contract.value.cmr,
       winnerAddress:
         'tex1pd2e4sk0yvnls5ad0rxgm9e7k3w543446wk4mrfv5lzusfh6snrhsazc5dq',
@@ -52,7 +52,10 @@ export function createBetEventHandler(pubkyes: {
       txnIdClientTwo:
         '6be9bd65fb41a116a0fbfb9d6ba52ebb64ae8df652f1a2ba430668dada9f1ae5',
     });
+
+    return pset;
   }
 
   console.log(`contrac result`, contract);
+  return 'Faill';
 }
