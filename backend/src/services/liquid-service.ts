@@ -2,7 +2,7 @@ import * as networks from 'liquidjs-lib/src/networks.js';
 import * as address from 'liquidjs-lib/src/address.js';
 import { Transaction } from 'liquidjs-lib/src/transaction.js';
 
-import * as http from 'http'; // Line 91
+import * as http from 'http';
 import * as https from 'https'
 
 import {
@@ -12,7 +12,17 @@ import {
   Updater as PsetUpdater,
   CreatorInput,
   CreatorOutput,
+  Pset,
 } from 'liquidjs-lib/src/psetv2/index.js';
+
+import { Signer as PsetSigner, BIP174SigningData } from 'liquidjs-lib/src/psetv2/signer.js';
+import * as bscript from 'liquidjs-lib/src/script.js';
+import * as ecc from 'tiny-secp256k1';
+
+interface KeyPair {
+  publicKey: Buffer;
+  sign(hash: Buffer): Buffer;
+}
 
 // Use the appropriate network (e.g., testnet for Liquid testnet)
 const NETWORK = networks.testnet; // or networks.regtest for local testing
@@ -24,6 +34,7 @@ type CreatePSETInput = {
   cmr: string;
   winnerAddress: string;
   programHex: string;
+  signers: KeyPair[][];
 };
 
 import axios from 'axios';
@@ -81,6 +92,36 @@ export async function broadcastTransaction(
     console.error('Error broadcasting transaction:', error);
     throw error;
   }
+}
+
+function signTransaction(
+  pset: Pset,
+  signers: KeyPair[][],
+  sighashType: number,
+  ecclib = ecc,
+): Transaction {
+  const signer = new PsetSigner(pset);
+
+  signers.forEach((keyPairs, i) => {
+    const preimage = pset.getInputPreimage(i, sighashType);
+    keyPairs.forEach((kp: KeyPair) => {
+      const partialSig: BIP174SigningData = {
+        partialSig: {
+          pubkey: kp.publicKey,
+          signature: bscript.signature.encode(kp.sign(preimage), sighashType),
+        },
+      };
+      signer.addSignature(i, partialSig, Pset.ECDSASigValidator(ecclib));
+    });
+  });
+
+  if (!pset.validateAllSignatures(Pset.ECDSASigValidator(ecclib))) {
+    throw new Error('Failed to sign pset');
+  }
+
+  const finalizer = new PsetFinalizer(pset);
+  finalizer.finalize();
+  return PsetExtractor.extract(pset);
 }
 
 
@@ -179,6 +220,14 @@ async function fetchUtxo(txid: string, vout: number): Promise<{ scriptPubKey: Bu
   // Directly set finalScriptWitness on the PSET input
   pset.inputs[0].finalScriptWitness = serializedWitness;
   pset.inputs[1].finalScriptWitness = serializedWitness;
+
+  signTransaction(
+      pset,
+      input.signers,
+      Transaction.SIGHASH_ALL,
+      // this demonstrates that is still possible to use tiny-secp256k1 lib for signing steps
+      ecc,
+    );
 
   const finalizer = new PsetFinalizer(pset);
   finalizer.finalize();

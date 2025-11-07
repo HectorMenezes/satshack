@@ -55,6 +55,7 @@ export async function main(): Promise<void> {
       txnIdClientTwo:
         '6be9bd65fb41a116a0fbfb9d6ba52ebb64ae8df652f1a2ba430668dada9f1ae5',
       programHex: contract.value.programHex,
+      signers: [],
     });
     console.log(`hex: `, hex);
     liquidService.broadcastTransaction(hex);
