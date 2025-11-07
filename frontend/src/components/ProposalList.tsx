@@ -1,10 +1,10 @@
 import { accounts } from "@/libs/accounts";
 import { KINDS, pool, RELAYS } from "@/libs/nostr";
-import { BetProposalsModel } from "@/models/BetProposals";
+import { BetProposal, BetProposalsModel } from "@/models/BetProposals";
 import { eventStore } from "@/stores/eventStore";
 import { mapEventsToStore } from "applesauce-core";
 import { onlyEvents } from "applesauce-relay";
-import { Component, For, from } from "solid-js";
+import { Component, For, from, Match, Switch } from "solid-js";
 import ProfilePicture from "./ProfilePicture";
 import { ProfilePreview } from "./ProfilePreview";
 import {
@@ -14,10 +14,15 @@ import {
   CardFooter,
   CardHeader,
 } from "./ui/card";
-
-const account = from(accounts.active$);
+import { Button } from "./ui/button";
+import { actionHub } from "@/actionHub";
+import { AcceptProposalAction } from "@/actions/acceptProposal";
 
 const proposals = from(eventStore.model(BetProposalsModel));
+
+function handleAccept(proposal: BetProposal) {
+  actionHub.run(AcceptProposalAction, proposal);
+}
 
 const ProposalList: Component = () => {
   return (
@@ -45,11 +50,20 @@ const ProposalList: Component = () => {
             </CardContent>
             <CardFooter>
               <div class="flex flex-row w-full">
-                <div class="flex">
+                <div class="flex text-sm">
                   <ProfilePreview pubkey={proposal.escrow} hideNip05={true} />
                 </div>
                 <div class="text-right text-lg w-full">
-                  <span class="">{proposal.amount}</span> sats
+                  <Switch>
+                    <Match when={!proposal.accepted}>
+                      <Button size="sm" onClick={() => handleAccept(proposal)}>
+                        Accept {proposal.amount} sats
+                      </Button>
+                    </Match>
+                    <Match when={proposal.accepted}>
+                      <div class="font-bold text-green-800">Accepted</div>
+                    </Match>
+                  </Switch>
                 </div>
               </div>
             </CardFooter>

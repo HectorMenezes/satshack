@@ -55,7 +55,6 @@ export default function CreateProposal() {
   }
 
   const handleSubmit: SubmitHandler<ProposalForm> = async (values) => {
-    console.log("Submitting...");
     actionHub.run(CreateProposalAction, values);
 
     reset(form);
@@ -145,16 +144,7 @@ export default function CreateProposal() {
               <Button class="mt-2 w-full" variant="link" onClick={handleBack}>
                 Back
               </Button>
-              <Button
-                class="mt-2 w-full"
-                onClick={() => {
-                  console.log(
-                    "AE",
-                    validate(form).then((e) => console.log(e))
-                  );
-                  submit(form);
-                }}
-              >
+              <Button class="mt-2 w-full" onClick={() => submit(form)}>
                 Submit
               </Button>
             </div>

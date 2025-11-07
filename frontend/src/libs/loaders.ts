@@ -20,8 +20,8 @@ export const betProposalsLoader = createTimelineLoader(
   pool,
   RELAYS,
   {
-    kinds: [KINDS.BET_PROPOSAL],
-    limit: 10,
+    kinds: [KINDS.BET_PROPOSAL, KINDS.BET_ACCEPTANCE],
+    limit: 50,
   },
   { eventStore }
 );

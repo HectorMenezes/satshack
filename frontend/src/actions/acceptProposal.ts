@@ -1,20 +1,19 @@
 import { Action } from "applesauce-actions";
-import { NostrEvent } from "nostr-tools";
 import { KINDS } from "@/libs/nostr";
-import { AcceptanceForm } from "@/schemas/acceptanceSchema";
+import { type BetProposal } from "@/models/BetProposals";
 
-export function CreateProposalAction(form: AcceptanceForm): Action {
+export function AcceptProposalAction(proposal: BetProposal): Action {
   return async function* ({ factory }) {
     const created_at = Math.floor(Date.now() / 1000);
 
     const draft = {
-      pubkey: form.counterparty,
+      pubkey: proposal.proposer,
       kind: KINDS.BET_ACCEPTANCE,
       content: "",
       tags: [
-        ["e", form.proposalId],
-        ["p", form.proposer],
-        ["p", form.escrow],
+        ["e", proposal.eventId],
+        ["p", proposal.counterparty],
+        ["p", proposal.escrow],
       ],
       created_at,
     };
