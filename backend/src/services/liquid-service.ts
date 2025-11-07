@@ -176,6 +176,10 @@ async function fetchUtxo(txid: string, vout: number): Promise<{ scriptPubKey: Bu
 
   updater.addInWitnessScript(0, serializedWitness);
 
+  // Directly set finalScriptWitness on the PSET input
+  pset.inputs[0].finalScriptWitness = serializedWitness;
+  pset.inputs[1].finalScriptWitness = serializedWitness;
+
   const finalizer = new PsetFinalizer(pset);
   finalizer.finalize();
   const tx = PsetExtractor.extract(pset);
