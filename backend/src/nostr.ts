@@ -1,4 +1,5 @@
 import { getPublicKey, generateSecretKey } from 'nostr-tools/pure';
+import { createBetEventHandler } from './events-handlers/create-bet.js';
 
 const ESCROW_SK = generateSecretKey();
 const ESCROW_PK = getPublicKey(ESCROW_SK);
@@ -14,14 +15,39 @@ export async function listenForEscrowEvents(): Promise<void> {
   pool.subscribeMany(
     RELAYS,
     {
-      kinds: [4],
-      '#p': [ESCROW_PK],
+      kinds: [30349],
     },
     {
-      onevent(event) {
-        console.log('Received event:', event);
-        // Here we would handle the event, for example, by decrypting the message
-        // and processing the escrow logic.
+      async onevent(event) {
+        console.log('event', event);
+        const { tags } = event;
+
+        const betProposalId = tags.filter((tag) => tag[0] === 'e')[0]?.[1];
+
+        if (!betProposalId) {
+          return;
+        }
+
+        console.log('betProposalId', betProposalId);
+
+        const betProposalEvent = await pool.get(RELAYS, {
+          ids: [betProposalId],
+        });
+
+        if (!betProposalEvent) {
+          console.log('it exists indeeed on this relay', event);
+        }
+
+        const parsedTages = Object.fromEntries(betProposalEvent?.tags || []);
+        console.log(parsedTages);
+
+        const pubkeys = {
+          CLIENT_ONE_PUBK: event.pubkey,
+          CLIENT_TWO_PUBK: parsedTages.counterparty,
+          ESCROW_PUBK: parsedTages.escrow,
+        };
+
+        createBetEventHandler(pubkeys);
       },
     },
   );
