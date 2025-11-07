@@ -81,7 +81,33 @@ export async function broadcastTransaction(
   }
 }
 
-export const createPSET = (input: CreatePSETInput): string => {
+
+// Function to fetch UTXO details (example using Blockstream API)
+async function fetchUtxo(txid: string, vout: number) {
+  try {
+    const response = await axios.get(
+      `https://blockstream.info/liquidtestnet/api/tx/${txid}`,
+    );
+    const tx = response.data;
+    const output = tx.vout[vout];
+    // Note: For Liquid, asset is from output.asset (hex), not assumed L_BTC
+    const assetHex = output.asset
+    return {
+      scriptPubKey: Buffer.from(output.scriptPubKey.hex, 'hex'),
+      value: Math.round(output.value * 1e8), // Convert to satoshis (L-BTC uses BTC units)
+      asset: Buffer.from(assetHex, 'hex'), // Parse actual asset from API
+    };
+  } catch (error) {
+    console.error(`Error fetching UTXO for txid ${txid}:${vout}`, error);
+    throw error;
+  }
+}
+
+ export const createPSET = async (input: CreatePSETInput): Promise<string> => {
+
+   const utxo1 = await fetchUtxo(input.txnIdClientOne, 0);
+  const utxo2 = await fetchUtxo(input.txnIdClientTwo, 0);
+
   // Assume vout 0 for both inputs; adjust if needed based on actual UTXOs
   const inputs: CreatorInput[] = [
     new CreatorInput(input.txnIdClientOne, 0),
@@ -109,6 +135,20 @@ export const createPSET = (input: CreatePSETInput): string => {
   updater.addInSighashType(0, Transaction.SIGHASH_ALL);
   updater.addInSighashType(1, Transaction.SIGHASH_ALL);
 
+   // Add witness UTXO for both inputs (use asset Buffer directly, no 'hex' encoding)
+  updater.addInWitnessUtxo(0, {
+    script: utxo1.scriptPubKey,
+    value: Buffer.from(utxo1.value, 'hex'),
+    nounce: Buffer.from(utxo1.value, 'hex'),
+    asset: utxo1.asset, // Already a Buffer
+  });
+  updater.addInWitnessUtxo(1, {
+    script: utxo2.scriptPubKey,
+    value: Buffer.from(utxo2.value, 'hex'),
+    nounce: Buffer.from(utxo2.value, 'hex'),
+    asset: utxo2.asset, // Already a Buffer
+  });
+
   const internalKey = Buffer.from(
     '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0',
     'hex',
@@ -122,10 +162,12 @@ export const createPSET = (input: CreatePSETInput): string => {
   const witnessStack: Buffer[] = [
 	      Buffer.from(''), // Empty first element
 	          Buffer.from(input.programHex, 'hex'), // Simplicity program
-		      Buffer.from(input.cmr, 'hex'), // Commitment Merkle Root
+		      cmr, // Commitment Merkle Root
 		          Buffer.from('bef5919fa64ce45f8306849072b26c1bfdd2937e6b81774796ff372bd1eb5362d2', 'hex'), // Control block
 			    ];
+            console.log('Witness stack lengths:', witnessStack.map(b => b.length)); // Debug: Verify stack
           const serializedWitness = serializeWitnessStack(witnessStack);
+
   updater.addInWitnessScript(0, serializedWitness);
 
   const finalizer = new PsetFinalizer(pset);

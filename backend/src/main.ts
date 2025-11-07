@@ -16,7 +16,7 @@ const CLIENT_TWO_PK =
 const ESCROW_PK =
   '0xf9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9'; // 3 * G
 
-export function main(): void {
+export async function main(): Promise<void> {
   const contractTemplatePath = path.join(
     __dirname,
     './contracts/escrow_with_delay.template.simf',
@@ -46,7 +46,7 @@ export function main(): void {
   const contract = compileSimplicityContract(contractPath);
 
   if (isOk(contract)) {
-    const hex = liquidService.createPSET({
+    const hex = await  liquidService.createPSET({
       cmr: contract.value.cmr,
       winnerAddress:
         'tex1pd2e4sk0yvnls5ad0rxgm9e7k3w543446wk4mrfv5lzusfh6snrhsazc5dq',
