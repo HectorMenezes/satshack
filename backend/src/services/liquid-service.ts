@@ -1,5 +1,6 @@
 import * as networks from 'liquidjs-lib/src/networks.js';
 import * as address from 'liquidjs-lib/src/address.js';
+import { Transaction } from 'liquidjs-lib/src/transaction.js';
 
 import {
   Finalizer as PsetFinalizer,
@@ -68,6 +69,9 @@ export const createPSET = (input: CreatePSETInput): string => {
     outputs,
   });
   const updater = new PsetUpdater(pset);
+
+  updater.addInSighashType(0, Transaction.SIGHASH_ALL);
+  updater.addInSighashType(1, Transaction.SIGHASH_ALL);
 
   const internalKey = Buffer.from(
     '50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0',
