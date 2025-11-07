@@ -14,17 +14,24 @@ export function compileSimplicityContract(
     return { ok: false, error: `Compilation failed: ${compileResult.stderr}` };
   }
 
-  const inputProgram = compileResult.stdout.replace('Program:', '').replace(/\n/g, '').trim();
+  const inputProgram = compileResult.stdout
+    .replace('Program:', '')
+    .replace(/\n/g, '')
+    .trim();
   if (!inputProgram) {
     return {
       ok: false,
-      error: 'Failed to compile Simplicity program: simc returned an empty output',
+      error:
+        'Failed to compile Simplicity program: simc returned an empty output',
     };
   }
 
-  const infoResult = shell.exec(`hal-simplicity simplicity info --liquid "${inputProgram}"`, {
-    silent: true,
-  });
+  const infoResult = shell.exec(
+    `hal-simplicity simplicity info --liquid "${inputProgram}"`,
+    {
+      silent: true,
+    },
+  );
   if (infoResult.code !== 0) {
     console.error('hal-simplicity error:', infoResult.stderr);
     return {

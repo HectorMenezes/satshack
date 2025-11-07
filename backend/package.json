@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "description": "A example of a simplicity escrow contrat with a nostr ui",
   "type": "module",
-
   "engines": {
     "node": ">= 22.11 < 23"
   },
@@ -43,10 +42,13 @@
     "test:watch": "vitest unit"
   },
   "dependencies": {
-    "nostr-tools": "^2.17.2",
+    "axios": "^1.13.2",
+    "ecpair": "^3.0.0",
     "fs-extra": "^11.3.2",
     "liquidjs-lib": "^6.0.2-liquid.37",
+    "nostr-tools": "^2.17.2",
     "shelljs": "^0.10.0",
+    "tiny-secp256k1": "^2.2.4",
     "tslib": "~2.8"
   },
   "volta": {

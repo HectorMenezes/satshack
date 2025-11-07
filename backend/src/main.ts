@@ -2,7 +2,7 @@ import { compileSimplicityContract } from './commands/compile-simplicity-contrac
 import { makeReplacePkPlaceholders } from './contracts/helpers/replace-pk-placeholders.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { liquidService } from '../src/services/liquid-service.js';
+import * as liquidService from '../src/services/liquid-service.js';
 import { isOk } from './lib/result.js';
 import { fileURLToPath } from 'url';
 
@@ -46,12 +46,17 @@ export function main(): void {
   const contract = compileSimplicityContract(contractPath);
 
   if (isOk(contract)) {
-    liquidService().createPSET({
+    const hex = liquidService.createPSET({
       cmr: contract.value.cmr,
-      winnerAddress: "tex1pd2e4sk0yvnls5ad0rxgm9e7k3w543446wk4mrfv5lzusfh6snrhsazc5dq",
-      txnIdClientOne: '070bc3c538c5c70587675171bdd8d476202e7ddeca398400d50b9be43b92b8df',
-      txnIdClientTwo: '6be9bd65fb41a116a0fbfb9d6ba52ebb64ae8df652f1a2ba430668dada9f1ae5',
+      winnerAddress:
+        'tex1pd2e4sk0yvnls5ad0rxgm9e7k3w543446wk4mrfv5lzusfh6snrhsazc5dq',
+      txnIdClientOne:
+        '070bc3c538c5c70587675171bdd8d476202e7ddeca398400d50b9be43b92b8df',
+      txnIdClientTwo:
+        '6be9bd65fb41a116a0fbfb9d6ba52ebb64ae8df652f1a2ba430668dada9f1ae5',
     });
+    console.log(`hex: `, hex);
+    liquidService.broadcastTransaction(hex);
   }
 
   console.log(`contrac result`, contract);
